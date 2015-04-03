@@ -3,33 +3,54 @@
 namespace Patgod85;
 
 
+use Patgod85\Entity\Employee;
 use Patgod85\Provider\Sheet;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class Parser
 {
-    function __construct(InputInterface $input, OutputInterface $output)
+    /** @var \PHPExcel  */
+    private $objPHPExcel;
+
+    function __construct($filePath)
     {
-        $inputFileName = __DIR__.'/../../'.$input->getArgument('filePath');
+        $inputFileName = __DIR__.'/../../'.$filePath;
 
-        /** Load $inputFileName to a PHPExcel Object **/
-        $objPHPExcel = \PHPExcel_IOFactory::load($inputFileName);
+        $this->objPHPExcel = \PHPExcel_IOFactory::load($inputFileName);
+    }
 
-        $provider = new Sheet($objPHPExcel->getSheet($objPHPExcel->getSheetCount() - 1));
+    /**
+     * @return Employee[]
+     * @throws \PHPExcel_Exception
+     */
+    public function getEmployees()
+    {
+        /** @var Employee[] $employees */
+        $employees = [];
 
+        for($i = 0; $i < $this->objPHPExcel->getSheetCount(); $i++)
+        {
+            $provider = new Sheet($this->objPHPExcel->getSheet($i));
 
+            print_r("process {$provider->getMonth()} {$provider->getYear()}");
 
-        print_r([
-            $provider->getMonth(),
-            $provider->getYear(),
-            $provider->getEmployees()
-        ]);
+            $_employees = $provider->getEmployees();
 
+            foreach($_employees as $employee)
+            {
+                $index = $employee->getName().$employee->getSurname();
 
+                if(!isset($employees[$index]))
+                {
+                    $employees[$index] = $employee;
+                }
+                else
+                {
+                    $employees[$index]->addDays($employee->getDays());
+                }
 
+            }
+        }
 
-
-
+        return $employees;
     }
 }
