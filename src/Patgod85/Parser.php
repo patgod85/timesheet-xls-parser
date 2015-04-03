@@ -11,21 +11,25 @@ class Parser
     /** @var \PHPExcel  */
     private $objPHPExcel;
 
+    /** @var Employee[] */
+    private $employees;
+
+    /** @var  \DateTime */
+    private $publicHolidays;
+
     function __construct($filePath)
     {
         $inputFileName = __DIR__.'/../../'.$filePath;
 
         $this->objPHPExcel = \PHPExcel_IOFactory::load($inputFileName);
+
+        $this->parse();
     }
 
-    /**
-     * @return Employee[]
-     * @throws \PHPExcel_Exception
-     */
-    public function getEmployees()
+    private function parse()
     {
-        /** @var Employee[] $employees */
-        $employees = [];
+        $this->employees = [];
+        $this->publicHolidays = [];
 
         for($i = 0; $i < $this->objPHPExcel->getSheetCount(); $i++)
         {
@@ -35,22 +39,40 @@ class Parser
 
             $_employees = $provider->getEmployees();
 
+            $this->publicHolidays = array_merge($this->publicHolidays, $provider->getPublicHolidays());
+
             foreach($_employees as $employee)
             {
                 $index = $employee->getName().$employee->getSurname();
 
-                if(!isset($employees[$index]))
+                if(!isset($this->employees[$index]))
                 {
-                    $employees[$index] = $employee;
+                    $this->employees[$index] = $employee;
                 }
                 else
                 {
-                    $employees[$index]->addDays($employee->getDays());
+                    $this->employees[$index]->addDays($employee->getDays());
                 }
-
             }
         }
-
-        return $employees;
     }
+
+    /**
+     * @return Employee[]
+     * @throws \PHPExcel_Exception
+     */
+    public function getEmployees()
+    {
+        return $this->employees;
+    }
+
+    /**
+     * @return \DateTime[]
+     */
+    public function getPublicHolidays()
+    {
+        return $this->publicHolidays;
+    }
+
+
 }

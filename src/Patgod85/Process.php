@@ -31,6 +31,8 @@ class Process extends Command
 
         $repository->storeEmployees($input->getArgument('teamName'), $parser->getEmployees());
 
+        $repository->storePublicHolidays($parser->getPublicHolidays());
+
         print_r('Done');
     }
 

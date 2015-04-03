@@ -151,7 +151,7 @@ eot;
             $query .= implode(',', $conditions);
 
             $sth = $this->dbh->prepare($query);
-print_r([$query, $params]);
+
             $sth->execute($params);
         }
     }
@@ -170,5 +170,37 @@ print_r([$query, $params]);
         $this->insertEmployees($teamId, $employees);
 
         $this->insertDays($employees);
+    }
+
+    /**
+     * @param \DateTime[] $publicHolidays
+     */
+    public function storePublicHolidays($publicHolidays)
+    {
+        if(!$publicHolidays)
+        {
+            return;
+        }
+
+        $query = <<<eot
+INSERT OR IGNORE INTO public_holiday (date)
+VALUES
+eot;
+
+        $params = [];
+
+        $conditions = [];
+
+        foreach($publicHolidays as $day)
+        {
+            $conditions[] = ' (?) ';
+            $params[] = $day->format('Y-m-d');
+        }
+
+        $query .= implode(',', $conditions);
+
+        $sth = $this->dbh->prepare($query);
+
+        $sth->execute($params);
     }
 }

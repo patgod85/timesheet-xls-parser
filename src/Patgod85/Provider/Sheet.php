@@ -10,29 +10,23 @@ class Sheet
     /** @var  \PHPExcel_Worksheet */
     private $worksheet;
 
+    /** @var Employee[] */
+    private $employees;
+
+    /** @var  \DateTime */
+    private $publicHolidays;
+
     /**
      * @param \PHPExcel_Worksheet $worksheet
      */
     public function __construct(\PHPExcel_Worksheet $worksheet)
     {
         $this->worksheet = $worksheet;
+
+        $this->parse();
     }
 
-    public function getMonth()
-    {
-        return $this->worksheet->getCell('C5')->getValue();
-    }
-
-    public function getYear()
-    {
-        return (int)$this->worksheet->getCell('C4')->getValue();
-    }
-
-    /**
-     * @return Employee[]
-     * @throws \PHPExcel_Exception
-     */
-    public function getEmployees()
+    private function parse()
     {
         /** @var int First employee row */
         $y = 10;
@@ -40,7 +34,8 @@ class Sheet
         /** @var int First day column */
         $x = 4;
 
-        $employees = [];
+        $this->employees = [];
+        $this->publicHolidays = [];
 
         do
         {
@@ -71,17 +66,47 @@ class Sheet
                         $employee->addDay(
                             $day
                         );
+                    }
+                    elseif($type == 'public holiday')
+                    {
+                        $date = $i+1;
 
+                        $this->publicHolidays[] = \DateTime::createFromFormat('d-F-Y', "{$date}-{$this->getMonth()}-{$this->getYear()}");
                     }
                 }
 
-                $employees[] = $employee;
+                $this->employees[] = $employee;
             }
 
             $y++;
         }
         while($name);
+    }
 
-        return $employees;
+    public function getMonth()
+    {
+        return $this->worksheet->getCell('C5')->getValue();
+    }
+
+    public function getYear()
+    {
+        return (int)$this->worksheet->getCell('C4')->getValue();
+    }
+
+    /**
+     * @return Employee[]
+     * @throws \PHPExcel_Exception
+     */
+    public function getEmployees()
+    {
+        return $this->employees;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getPublicHolidays()
+    {
+        return $this->publicHolidays;
     }
 }
