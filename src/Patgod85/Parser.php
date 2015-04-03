@@ -35,7 +35,7 @@ class Parser
         {
             $provider = new Sheet($this->objPHPExcel->getSheet($i));
 
-            print_r("process {$provider->getMonth()} {$provider->getYear()}");
+            print_r("process {$provider->getMonth()} {$provider->getYear()}\n");
 
             $_employees = $provider->getEmployees();
 
@@ -43,6 +43,11 @@ class Parser
 
             foreach($_employees as $employee)
             {
+                if(!$employee->getWorkStart())
+                {
+                    $employee->setWorkStart(\DateTime::createFromFormat('d-F-Y', "01-{$provider->getMonth()}-{$provider->getYear()}"));
+                }
+
                 $index = $employee->getName().$employee->getSurname();
 
                 if(!isset($this->employees[$index]))

@@ -99,8 +99,8 @@ eot;
         foreach($employees as $employee)
         {
             $query = <<<eot
-INSERT INTO employee (name, surname, team_id)
-VALUES (?, ?, ?)
+INSERT INTO employee (name, surname, work_start, team_id)
+VALUES (?, ?, ?, ?)
 eot;
 
             $sth = $this->dbh->prepare($query);
@@ -108,6 +108,7 @@ eot;
             $sth->execute([
                 $employee->getName(),
                 $employee->getSurname(),
+                $employee->getWorkStart()->format('Y-m-d'),
                 $teamId
             ]);
 

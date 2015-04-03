@@ -22,6 +22,9 @@ class Employee
      */
     private $days;
 
+    /** @var \DateTime */
+    private $workStart;
+
     /**
      * @param $name
      * @throws \Exception
@@ -91,6 +94,22 @@ class Employee
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getWorkStart()
+    {
+        return $this->workStart;
+    }
+
+    /**
+     * @param \DateTime $workStart
+     */
+    public function setWorkStart($workStart)
+    {
+        $this->workStart = $workStart;
     }
 
 
