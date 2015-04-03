@@ -1,0 +1,13 @@
+{
+    "name": "patgod85/timesheet-xls-parser",
+    "require": {
+        "php": ">=5.3.3",
+        "phpoffice/phpexcel": "dev-master",
+        "symfony/console": ">=2.0.10"
+    },
+    "autoload": {
+        "psr-0": {
+            "": "src/"
+        }
+    }
+}
