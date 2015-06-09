@@ -47,19 +47,36 @@ class Sheet
 
                 for($i = 0; $i < 31; $i++)
                 {
+                    $date = $i+1;
+
+                    $dateTime = \DateTime::createFromFormat('d-F-Y', "{$date}-{$this->getMonth()}-{$this->getYear()}");
+
+                    if($dateTime->format('F') != $this->getMonth())
+                    {
+                        continue;
+                    }
+
                     $dayProvider = \Patgod85\Provider\Day::getInstance(
                         $this->worksheet->getCellByColumnAndRow($x + $i, $y)
                     );
 
                     $type = $dayProvider->getType();
 
-                    if(!in_array($type, ['1st shift 9 am to 6 pm', 'day off', 'public holiday']))
+
+                    if(!in_array($type, ['', 'day off', 'public holiday']) && !$employee->getWorkStart())
                     {
+                        $employee->setWorkStart($dateTime);
+                    }
 
-                        $date = $i+1;
+                    if($type == '' && $employee->getWorkStart())
+                    {
+                        $type = 'progul';
+                    }
 
+                    if(!in_array($type, ['', '1st shift 9 am to 6 pm', 'day off', 'public holiday']))
+                    {
                         $day = new Day(
-                            \DateTime::createFromFormat('d-F-Y', "{$date}-{$this->getMonth()}-{$this->getYear()}"),
+                            $dateTime,
                             $type
                         );
 
@@ -69,9 +86,7 @@ class Sheet
                     }
                     elseif($type == 'public holiday')
                     {
-                        $date = $i+1;
-
-                        $this->publicHolidays[] = \DateTime::createFromFormat('d-F-Y', "{$date}-{$this->getMonth()}-{$this->getYear()}");
+                        $this->publicHolidays[] = $dateTime;
                     }
                 }
 

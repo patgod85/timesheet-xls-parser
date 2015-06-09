@@ -53,7 +53,7 @@ class Employee
      */
     public function addDays($days)
     {
-        $this->days += $days;
+        $this->days = array_merge($this->days, $days);
     }
 
     /**

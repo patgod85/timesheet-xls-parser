@@ -64,9 +64,13 @@ class Day
     {
         $preType = $this->colours[$this->getColor()];
 
-        if($preType == 'paid holiday' && $this->getTitle() == "1/ot")
+        if($preType == '1st shift 9 am to 6 pm' && $this->getTitle() == "")
         {
-            $preType = 'paid+half a day off';
+            $preType = '';
+        }
+        elseif($preType == 'paid holiday' && $this->getTitle() == "1/ot")
+        {
+            $preType = 'paid holiday + half a day off';
         }
 
         return $preType;
